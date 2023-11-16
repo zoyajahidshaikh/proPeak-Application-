@@ -64,6 +64,38 @@
 
 ## Initial data Script
 
+\***\*\*\*\*\*** Create Project  \***\*\*\*\*\*\*\***\*\*\*\***\*\*\*\*\*\*\***
+db.createCollection('projects')
+
+const projectSchema = {
+  projectName: String,
+  description: String,
+  startDate: Date,
+  endDate: Date,
+  status: {
+    type: String,
+    enum: ['New', 'On Hold', 'In Progress', 'Completed']
+  },
+  assignedUsers: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'users' // Reference to the 'users' collection
+  }],
+  tasks: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'tasks' // Reference to the 'tasks' collection
+  }],
+  createdOn: {
+    type: Date,
+    default: Date.now
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'users' // Reference to the 'users' collection
+  }
+};
+
+db.projects.insert(projectSchema);
+
 \***\*\*\*\*\*** userroles \***\*\*\*\*\*\*\***\*\*\*\***\*\*\*\*\*\*\***
 
 db.createCollection('userroles')
@@ -317,3 +349,4 @@ db.holidays.insert({"year":2019,"month":10,"monthName":"Oct","date":8,"fullDate"
 db.holidays.insert({"year":2019,"month":10,"monthName":"Oct","date":28,"fullDate":"2019-10-28","description":"Diwali Laxmi Pooja","type":"","frequency":"yearly","all":"","day":"","dayName":"","isActive":"1"});
 db.holidays.insert({"year":2019,"month":10,"monthName":"Oct","date":29,"fullDate":"2019-10-29","description":"Diwali-Bhaubeej","type":"","frequency":"yearly","all":"","day":"","dayName":"","isActive":"1"});
 db.holidays.insert({"year":2019,"month":12,"monthName":"Dec","date":25,"fullDate":"2019-12-25","description":"X-mas Eve","type":"","frequency":"yearly","all":"","day":"","dayName":"","isActive":"1"});
+# proPeak-Application-
