@@ -286,14 +286,11 @@ exports.getProjectDataByProjectId = ((req, res) => {
 //     });
 //   }
 // };
-
-
-//second one 
+//okay 
 exports.createProject = (req, res) => {
   try {
     console.log('Incoming request body:', req.body);
 
-    // Assuming these dependencies are properly imported and defined (access, Project, audit)
     let userRole = req.userInfo.userRole.toLowerCase();
     let accessCheck = access.checkEntitlements(userRole);
     
@@ -308,15 +305,17 @@ exports.createProject = (req, res) => {
     const projectUsers = req.body.newprojects.projectUsers.map((puser) => puser);
     const notifyUsers = req.body.newprojects.notifyUsers.map((nuser) => nuser);
 
+    const category = req.body.newprojects.category;
+    const formattedCategory = Array.isArray(category) ? category.join(', ') : category;
+
     const newProject = new Project({
-      // Assuming these properties exist in the request body
       _id: req.body.newprojects._id,
       title: req.body.newprojects.title,
       description: req.body.newprojects.description,
       startdate: req.body.newprojects.startdate,
       enddate: req.body.newprojects.enddate,
       status: req.body.newprojects.status,
-      category: req.body.newprojects.category,
+      category: formattedCategory,
       userid: req.body.newprojects.userid,
       group: req.body.newprojects.group,
       companyId: req.body.newprojects.companyId,
@@ -336,57 +335,129 @@ exports.createProject = (req, res) => {
 
     newProject.save()
       .then((result) => {
-        console.log('Project created successfully:', result);
-
-        let userIdToken = req.userInfo.userName;
-        let fields = Object.keys(result._doc).filter((key) => !['_id', 'createdBy', 'createdOn', 'modifiedBy', 'modifiedOn', 'tasks'].includes(key));
-
-        fields.forEach((field) => {
-          if (result[field] && result[field].length) {
-            if (field === 'userid') {
-              audit.insertAuditLog('', result.title, 'Project', field, userName, userIdToken, result._id);
-            } else if (field === 'projectUsers') {
-              result[field].forEach((p) => {
-                audit.insertAuditLog('', result.title, 'Project', field, p.name, userIdToken, result._id);
-              });
-            } else if (field === 'notifyUsers') {
-              result[field].forEach((n) => {
-                audit.insertAuditLog('', result.title, 'Project', field, n.name, userIdToken, result._id);
-              });
-            } else if (field === 'userGroups') {
-              result[field].forEach((n) => {
-                audit.insertAuditLog('', result.title, 'Project', field, n.groupName, userIdToken, result._id);
-              });
-            } else {
-              audit.insertAuditLog('', result.title, 'Project', field, result[field], userIdToken, result._id);
-            }
-          }
-        });
-
+        // Handle successful project creation
         res.status(200).json({
           success: true,
           msg: `Successfully added!`
         });
       })
       .catch((err) => {
+        // Handle project creation error
         console.error('Error while creating project:', err);
-        if (err.errors) {
-          res.status(500).json({
-            err: errors.ADD_PROJECT_ERROR
-          });
-        } else {
-          res.status(500).json({
-            err: 'Unexpected error occurred'
-          });
-        }
+        res.status(500).json({
+          err: errors.ADD_PROJECT_ERROR
+        });
       });
   } catch (error) {
+    // Handle unexpected errors
     console.error('Error occurred in createProject:', error);
     res.status(500).json({
       err: 'Unexpected error occurred'
     });
   }
 };
+
+
+
+//second one 
+// exports.createProject = (req, res) => {
+//   try {
+//     console.log('Incoming request body:', req.body);
+
+//     // Assuming these dependencies are properly imported and defined (access, Project, audit)
+//     let userRole = req.userInfo.userRole.toLowerCase();
+//     let accessCheck = access.checkEntitlements(userRole);
+    
+//     if (!accessCheck) {
+//       console.log('User not authorized');
+//       return res.status(403).json({ err: errors.NOT_AUTHORIZED });
+//     }
+
+//     let userId = req.userInfo.userId;
+//     let userName = req.body.userName;
+
+//     const projectUsers = req.body.newprojects.projectUsers.map((puser) => puser);
+//     const notifyUsers = req.body.newprojects.notifyUsers.map((nuser) => nuser);
+
+//     const newProject = new Project({
+//       // Assuming these properties exist in the request body
+//       _id: req.body.newprojects._id,
+//       title: req.body.newprojects.title,
+//       description: req.body.newprojects.description,
+//       startdate: req.body.newprojects.startdate,
+//       enddate: req.body.newprojects.enddate,
+//       status: req.body.newprojects.status,
+//       category: req.body.newprojects.category,
+//       userid: req.body.newprojects.userid,
+//       group: req.body.newprojects.group,
+//       companyId: req.body.newprojects.companyId,
+//       userGroups: req.body.newprojects.userGroups,
+//       sendnotification: req.body.newprojects.sendnotification,
+//       createdBy: req.body.newprojects.createdBy,
+//       createdOn: req.body.newprojects.createdOn,
+//       modifiedBy: req.body.newprojects.modifiedBy,
+//       modifiedOn: req.body.newprojects.modifiedOn,
+//       isDeleted: req.body.newprojects.isDeleted,
+//       projectUsers: projectUsers,
+//       notifyUsers: notifyUsers,
+//       miscellaneous: req.body.newprojects.miscellaneous,
+//       archive: req.body.newprojects.archive
+//       // Add other properties here...
+//     });
+
+//     newProject.save()
+//       .then((result) => {
+//         console.log('Project created successfully:', result);
+
+//         let userIdToken = req.userInfo.userName;
+//         let fields = Object.keys(result._doc).filter((key) => !['_id', 'createdBy', 'createdOn', 'modifiedBy', 'modifiedOn', 'tasks'].includes(key));
+
+//         fields.forEach((field) => {
+//           if (result[field] && result[field].length) {
+//             if (field === 'userid') {
+//               audit.insertAuditLog('', result.title, 'Project', field, userName, userIdToken, result._id);
+//             } else if (field === 'projectUsers') {
+//               result[field].forEach((p) => {
+//                 audit.insertAuditLog('', result.title, 'Project', field, p.name, userIdToken, result._id);
+//               });
+//             } else if (field === 'notifyUsers') {
+//               result[field].forEach((n) => {
+//                 audit.insertAuditLog('', result.title, 'Project', field, n.name, userIdToken, result._id);
+//               });
+//             } else if (field === 'userGroups') {
+//               result[field].forEach((n) => {
+//                 audit.insertAuditLog('', result.title, 'Project', field, n.groupName, userIdToken, result._id);
+//               });
+//             } else {
+//               audit.insertAuditLog('', result.title, 'Project', field, result[field], userIdToken, result._id);
+//             }
+//           }
+//         });
+
+//         res.status(200).json({
+//           success: true,
+//           msg: `Successfully added!`
+//         });
+//       })
+//       .catch((err) => {
+//         console.error('Error while creating project:', err);
+//         if (err.errors) {
+//           res.status(500).json({
+//             err: errors.ADD_PROJECT_ERROR
+//           });
+//         } else {
+//           res.status(500).json({
+//             err: 'Unexpected error occurred'
+//           });
+//         }
+//       });
+//   } catch (error) {
+//     console.error('Error occurred in createProject:', error);
+//     res.status(500).json({
+//       err: 'Unexpected error occurred'
+//     });
+//   }
+// };
 
 // exports.createProject = ((req, res) => {
 //   // console.log("req.body",req.body);
