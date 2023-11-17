@@ -65,36 +65,23 @@
 ## Initial data Script
 
 \***\*\*\*\*\*** Create Project  \***\*\*\*\*\*\*\***\*\*\*\***\*\*\*\*\*\*\***
-db.createCollection('projects')
-
-const projectSchema = {
-  projectName: String,
-  description: String,
-  startDate: Date,
-  endDate: Date,
-  status: {
-    type: String,
-    enum: ['New', 'On Hold', 'In Progress', 'Completed']
-  },
-  assignedUsers: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'users' // Reference to the 'users' collection
-  }],
-  tasks: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'tasks' // Reference to the 'tasks' collection
-  }],
-  createdOn: {
-    type: Date,
-    default: Date.now
-  },
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'users' // Reference to the 'users' collection
+db.createCollection("applevelaccessrights", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["entitlementId", "group", "access", "createdBy", "createdOn", "isDeleted", "userId"],
+      properties: {
+        entitlementId: { bsonType: "string" },
+        group: { bsonType: "string" },
+        access: { bsonType: "bool" },
+        createdBy: { bsonType: "string" },
+        createdOn: { bsonType: "date" },
+        isDeleted: { bsonType: "bool" },
+        userId: { bsonType: "string" }
+      }
+    }
   }
-};
-
-db.projects.insert(projectSchema);
+})
 
 \***\*\*\*\*\*** userroles \***\*\*\*\*\*\*\***\*\*\*\***\*\*\*\*\*\*\***
 
