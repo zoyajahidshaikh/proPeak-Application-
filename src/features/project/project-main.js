@@ -35,7 +35,6 @@ export default class ProjectMain extends Component {
       appLevelAccess: this.props.context.state.appLevelAccess,
       showProjectMenuIcons: false,
       showArchive: this.props.context.state.showArchive,
-
     }
 
     this.onGroupChanged = this.onGroupChanged.bind(this);
