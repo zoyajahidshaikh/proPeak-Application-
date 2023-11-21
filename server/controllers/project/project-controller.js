@@ -288,12 +288,14 @@ exports.getProjectDataByProjectId = ((req, res) => {
 // };
 //okay 
 exports.createProject = (req, res) => {
+  debugger;
   try {
     console.log('Incoming request body:', req.body);
 
     let userRole = req.userInfo.userRole.toLowerCase();
     let accessCheck = access.checkEntitlements(userRole);
-    
+    debugger;
+
     if (!accessCheck) {
       console.log('User not authorized');
       return res.status(403).json({ err: errors.NOT_AUTHORIZED });
@@ -307,6 +309,7 @@ exports.createProject = (req, res) => {
 
     const category = req.body.newprojects.category;
     const formattedCategory = Array.isArray(category) ? category.join(', ') : category;
+    debugger;
 
     const newProject = new Project({
       _id: req.body.newprojects._id,
@@ -332,6 +335,7 @@ exports.createProject = (req, res) => {
       archive: req.body.newprojects.archive
       // Add other properties here...
     });
+    debugger;
 
     newProject.save()
       .then((result) => {
@@ -355,6 +359,8 @@ exports.createProject = (req, res) => {
       err: 'Unexpected error occurred'
     });
   }
+  debugger;
+
 };
 
 
