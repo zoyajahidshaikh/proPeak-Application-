@@ -163,8 +163,6 @@ export default class ProjectMain extends Component {
   async loadData() {
     await this.getAllProjectsSummary();
   }
-
-
   componentWillReceiveProps(nextProps) {
     this.setState({
       users: nextProps.context.state.users,
