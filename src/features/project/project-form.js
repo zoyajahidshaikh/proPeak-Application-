@@ -97,7 +97,6 @@ export default class ProjectForm extends React.Component {
             }
         }
     }
-
     onSelectUserChanged(e) {
         let selectedUser = e.target.value;
         let notifyUsers = Object.assign([], this.state.notifiedUsers);

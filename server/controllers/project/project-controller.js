@@ -912,6 +912,8 @@ exports.getTasksAndUsers = ((req, res) => {
 });
 
 exports.getAllProjectsSummary = ((req, res) => {
+  console.log('Request body:', req.body);
+
   try {
     let selectedUserId = req.body.userId;
     let selectedUserRole = req.body.userRole;
@@ -1016,6 +1018,8 @@ exports.getAllProjectsSummary = ((req, res) => {
     logInfo([projectCond, projectFields], "getAllProjectsSummary filtercondition");
     Project.aggregate([projectCond, projectFields])//.sort({title:1})
       .then((result) => {
+        console.log('Projects retrieved:', result.length);
+
         let userIds =[];
         
       
@@ -1116,6 +1120,8 @@ exports.getAllProjectsSummary = ((req, res) => {
         });
       })
       .catch((err) => {
+        console.error('Error in project aggregation:', err);
+
         logError(err, "getAllProjectsSummary err");
         res.json({
           err: errors.SERVER_ERROR
