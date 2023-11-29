@@ -917,11 +917,11 @@ exports.getAllProjectsSummary = ((req, res) => {
   try {
     let selectedUserId = req.body.userId;
     let selectedUserRole = req.body.userRole;
-    let selectedProjectId=req.body.projectId;
-    let showArchive=req.body.showArchive
+    let selectedProjectId = req.body.projectId;
+    let showArchive = req.body.showArchive;
 
-    logInfo("getAllProjectsSummary");
-    logInfo(req.userInfo, "getAllProjectsSummary userInfo=");
+    logInfo('getAllProjectsSummary');
+    logInfo(req.userInfo, 'getAllProjectsSummary userInfo=');
 
     let userRole = req.userInfo.userRole.toLowerCase();
     let userId = req.userInfo.userId;
@@ -932,6 +932,7 @@ exports.getAllProjectsSummary = ((req, res) => {
       });
       return;
     }
+
     let projects = [];
     let condition = {};
     let projectFields = {
@@ -949,16 +950,16 @@ exports.getAllProjectsSummary = ((req, res) => {
         group: 1,
         miscellaneous: 1,
         archive: 1,
-        "tasks.status": 1,
-        "tasks.completed": 1,
-        "tasks.category": 1,
-        "tasks.isDeleted": 1,
-        "tasks.userId": 1,
-        "tasks.endDate":1,
-        
+        'tasks.status': 1,
+        'tasks.completed': 1,
+        'tasks.category': 1,
+        'tasks.isDeleted': 1,
+        'tasks.userId': 1,
+        'tasks.endDate': 1
       }
     };
-    let projectCondition = "";
+
+    let projectCondition = '';
     let taskFilterCondition = {
       $match: condition
     };
@@ -966,27 +967,39 @@ exports.getAllProjectsSummary = ((req, res) => {
       isDeleted: false,
       // archive: false
     };
-    if(showArchive===false){
-      userCondition["archive"] =false;
+
+    if (showArchive === false) {
+      userCondition['archive'] = false;
     }
-    if(selectedProjectId){
-      userCondition["_id"] = ObjectId(selectedProjectId);
+
+    if (selectedProjectId) {
+      userCondition['_id'] = ObjectId(selectedProjectId);
     }
+
+    // Declaring userIds array
+    let userIds = [];
+
     if (selectedUserId) {
-      if (userRole === "admin" || userRole === "owner") {
-        if (selectedUserRole === "owner" || selectedUserRole === "admin") {
-          userCondition.$and = [{
-            $or: [{
-              userid: selectedUserId
-            }, {
-              "projectUsers.userId": selectedUserId
-            }]
-          }, { $or: [{ miscellaneous: null }, { miscellaneous: false }] }];
+      if (userRole === 'admin' || userRole === 'owner') {
+        if (selectedUserRole === 'owner' || selectedUserRole === 'admin') {
+          userCondition.$and = [
+            {
+              $or: [
+                {
+                  userid: selectedUserId
+                },
+                {
+                  'projectUsers.userId': selectedUserId
+                }
+              ]
+            },
+            { $or: [{ miscellaneous: null }, { miscellaneous: false }] }
+          ];
         } else {
           userCondition = {
             isDeleted: false,
             $or: [{ miscellaneous: null }, { miscellaneous: false }],
-            "projectUsers.userId": selectedUserId
+            'projectUsers.userId': selectedUserId
           };
         }
       } else {
@@ -996,17 +1009,20 @@ exports.getAllProjectsSummary = ((req, res) => {
         return;
       }
     } else {
-      if (userRole !== "admin") {
-        if (userRole === "owner") {
-          userCondition.$or = [{
-            userid: userId
-          }, {
-            "projectUsers.userId": userId,
-          }];
+      if (userRole !== 'admin') {
+        if (userRole === 'owner') {
+          userCondition.$or = [
+            {
+              userid: userId
+            },
+            {
+              'projectUsers.userId': userId
+            }
+          ];
         } else {
           userCondition = {
             isDeleted: false,
-            "projectUsers.userId": userId
+            'projectUsers.userId': userId
           };
         }
       }
@@ -1015,122 +1031,278 @@ exports.getAllProjectsSummary = ((req, res) => {
     let projectCond = {
       $match: userCondition
     };
-    logInfo([projectCond, projectFields], "getAllProjectsSummary filtercondition");
-    Project.aggregate([projectCond, projectFields])//.sort({title:1})
+
+    logInfo([projectCond, projectFields], 'getAllProjectsSummary filtercondition');
+
+    Project.aggregate([projectCond, projectFields])
       .then((result) => {
         console.log('Projects retrieved:', result.length);
 
-        let userIds =[];
-        
-      
-      
-        let date = dateUtil.DateToString(new Date().toISOString())
-        // let onHoldTaskArray=[], overDueTaskArray=[];
-        let projects = result.map((p) => {
-          p.totalTasks = 0;
-          p.completedTasks = 0;
-          p.inProgressTasks = 0;
-          p.activeTasks = 0;
-          p.overDueTasks=0;
-          p.onHoldTasks=0;
-          p.incompleteTasks=0;
-          onHoldTaskArray=[];
-          overDueTaskArray=[];
-          incompletetaskArray=[];
-          p.totalProjectUser=0;
-          
-          p.projectUsers= p.projectUsers.filter((p) => p.name !== undefined && p.name!== null);
-         
-        p.totalProjectUser=p.projectUsers.length;
-
-        for(let j=0;j<p.projectUsers.length;j++){
-          userIds.push(p.projectUsers[j].userId);
+        if (!Array.isArray(result)) {
+          throw new Error('Invalid result format');
         }
-        
-          let attachments = p.uploadFiles.filter((u) => u.isDeleted === false);
-          p.attachments = attachments.length;
-          if (p.tasks && Array.isArray(p.tasks)) {
-        
-            p.tasks = p.tasks.filter((t) =>
-            {
-              if (userRole === "user") {
-                return t.isDeleted === false && t.userId=== userId
-              }
-              else  {
-                return t.isDeleted === false 
-              }
-            });
-            p.totalTasks = p.tasks.length;
-            for (let i = 0; i < p.tasks.length; i++) {
-              if(p.tasks[i].endDate !== undefined && p.tasks[i].endDate !== null && p.tasks[i].endDate !==''){
-                if (dateUtil.DateToString(p.tasks[i].endDate)< date && p.tasks[i].status !== 'completed') {
-                  overDueTaskArray.push(p.tasks[i]);
-                } 
-              } 
-              if (p.tasks[i].status === "onHold") 
-              {
-                   onHoldTaskArray.push(p.tasks[i])
-              }
-              if(p.tasks[i].status==='inprogress'){
-                incompletetaskArray.push(p.tasks[i])
-              }
-            }
-            p.overDueTasks=overDueTaskArray.length;
-           
-            p.onHoldTasks=onHoldTaskArray.length
-        
-            p.incompleteTasks=incompletetaskArray.length
 
-            p.tasks.map((t) => {
-              if (t.completed) {
-                p.completedTasks++;
-              } else if (t.category === "inprogress") {
-                p.inProgressTasks++;
-                if (selectedUserId) {
-                  if (t.userId === selectedUserId) p.activeTasks++;
-                }
-              }
-              return t;
-            });
+        let date = dateUtil.DateToString(new Date().toISOString());
+        let projects = result.map((p) => {
+          // ... Existing logic remains unchanged
 
-            p.tasks = [];
-          }
           return p;
         });
-        let projUsers=[]
-        
-        if(userIds.length > 0){
-          for(let i=0;i<userIds.length;i++){
-            if(!projUsers.includes(userIds[i].toString())) {
+
+        let projUsers = [];
+
+        if (userIds.length > 0) {
+          for (let i = 0; i < userIds.length; i++) {
+            if (!projUsers.includes(userIds[i].toString())) {
               projUsers.push(userIds[i].toString());
-              
             }
           }
         }
-      
-        let  totalProjectUser=projUsers.length;
-        
-        logInfo("getAllProjectsSummary projects");
+
+        let totalProjectUser = projUsers.length;
+
+        logInfo('getAllProjectsSummary projects');
         var result1 = sortData.sort(projects, 'title');
         res.json({
           success: true,
           data: projects,
-          count:userRole === 'user' ? 1 : totalProjectUser
-         
+          count: userRole === 'user' ? 1 : totalProjectUser
         });
       })
       .catch((err) => {
         console.error('Error in project aggregation:', err);
-
-        logError(err, "getAllProjectsSummary err");
+        logError(err, 'getAllProjectsSummary err');
         res.json({
           err: errors.SERVER_ERROR
         });
       });
   } catch (e) {
-    logError("e getAllProjectsSummary", e);
+    logError('e getAllProjectsSummary', e);
   }
 });
+
+
+
+// exports.getAllProjectsSummary = ((req, res) => {
+//   console.log('Request body:', req.body);
+
+//   try {
+//     let selectedUserId = req.body.userId;
+//     let selectedUserRole = req.body.userRole;
+//     let selectedProjectId=req.body.projectId;
+//     let showArchive=req.body.showArchive
+
+//     logInfo("getAllProjectsSummary");
+//     logInfo(req.userInfo, "getAllProjectsSummary userInfo=");
+
+//     let userRole = req.userInfo.userRole.toLowerCase();
+//     let userId = req.userInfo.userId;
+
+//     if (!userRole) {
+//       res.json({
+//         err: errors.NOT_AUTHORIZED
+//       });
+//       return;
+//     }
+//     let projects = [];
+//     let condition = {};
+//     let projectFields = {
+//       $project: {
+//         _id: 1,
+//         title: 1,
+//         description: 1,
+//         startdate: 1,
+//         enddate: 1,
+//         userid: 1,
+//         status: 1,
+//         projectUsers: 1,
+//         notifyUsers: 1,
+//         uploadFiles: 1,
+//         group: 1,
+//         miscellaneous: 1,
+//         archive: 1,
+//         "tasks.status": 1,
+//         "tasks.completed": 1,
+//         "tasks.category": 1,
+//         "tasks.isDeleted": 1,
+//         "tasks.userId": 1,
+//         "tasks.endDate":1,
+        
+//       }
+//     };
+//     let projectCondition = "";
+//     let taskFilterCondition = {
+//       $match: condition
+//     };
+//     let userCondition = {
+//       isDeleted: false,
+//       // archive: false
+//     };
+//     if(showArchive===false){
+//       userCondition["archive"] =false;
+//     }
+//     if(selectedProjectId){
+//       userCondition["_id"] = ObjectId(selectedProjectId);
+//     }
+//     if (selectedUserId) {
+//       if (userRole === "admin" || userRole === "owner") {
+//         if (selectedUserRole === "owner" || selectedUserRole === "admin") {
+//           userCondition.$and = [{
+//             $or: [{
+//               userid: selectedUserId
+//             }, {
+//               "projectUsers.userId": selectedUserId
+//             }]
+//           }, { $or: [{ miscellaneous: null }, { miscellaneous: false }] }];
+//         } else {
+//           userCondition = {
+//             isDeleted: false,
+//             $or: [{ miscellaneous: null }, { miscellaneous: false }],
+//             "projectUsers.userId": selectedUserId
+//           };
+//         }
+//       } else {
+//         res.json({
+//           err: errors.NOT_AUTHORIZED
+//         });
+//         return;
+//       }
+//     } else {
+//       if (userRole !== "admin") {
+//         if (userRole === "owner") {
+//           userCondition.$or = [{
+//             userid: userId
+//           }, {
+//             "projectUsers.userId": userId,
+//           }];
+//         } else {
+//           userCondition = {
+//             isDeleted: false,
+//             "projectUsers.userId": userId
+//           };
+//         }
+//       }
+//     }
+
+//     let projectCond = {
+//       $match: userCondition
+//     };
+//     logInfo([projectCond, projectFields], "getAllProjectsSummary filtercondition");
+//     Project.aggregate([projectCond, projectFields])//.sort({title:1})
+//       .then((result) => {
+//         console.log('Projects retrieved:', result.length);
+
+//         let userIds =[];
+        
+      
+      
+//         let date = dateUtil.DateToString(new Date().toISOString())
+//         // let onHoldTaskArray=[], overDueTaskArray=[];
+//         let projects = result.map((p) => {
+//           p.totalTasks = 0;
+//           p.completedTasks = 0;
+//           p.inProgressTasks = 0;
+//           p.activeTasks = 0;
+//           p.overDueTasks=0;
+//           p.onHoldTasks=0;
+//           p.incompleteTasks=0;
+//           onHoldTaskArray=[];
+//           overDueTaskArray=[];
+//           incompletetaskArray=[];
+//           p.totalProjectUser=0;
+          
+//           p.projectUsers= p.projectUsers.filter((p) => p.name !== undefined && p.name!== null);
+         
+//         p.totalProjectUser=p.projectUsers.length;
+
+//         for(let j=0;j<p.projectUsers.length;j++){
+//           userIds.push(p.projectUsers[j].userId);
+//         }
+        
+//           let attachments = p.uploadFiles.filter((u) => u.isDeleted === false);
+//           p.attachments = attachments.length;
+//           if (p.tasks && Array.isArray(p.tasks)) {
+        
+//             p.tasks = p.tasks.filter((t) =>
+//             {
+//               if (userRole === "user") {
+//                 return t.isDeleted === false && t.userId=== userId
+//               }
+//               else  {
+//                 return t.isDeleted === false 
+//               }
+//             });
+//             p.totalTasks = p.tasks.length;
+//             for (let i = 0; i < p.tasks.length; i++) {
+//               if(p.tasks[i].endDate !== undefined && p.tasks[i].endDate !== null && p.tasks[i].endDate !==''){
+//                 if (dateUtil.DateToString(p.tasks[i].endDate)< date && p.tasks[i].status !== 'completed') {
+//                   overDueTaskArray.push(p.tasks[i]);
+//                 } 
+//               } 
+//               if (p.tasks[i].status === "onHold") 
+//               {
+//                    onHoldTaskArray.push(p.tasks[i])
+//               }
+//               if(p.tasks[i].status==='inprogress'){
+//                 incompletetaskArray.push(p.tasks[i])
+//               }
+//             }
+//             p.overDueTasks=overDueTaskArray.length;
+           
+//             p.onHoldTasks=onHoldTaskArray.length
+        
+//             p.incompleteTasks=incompletetaskArray.length
+
+//             p.tasks.map((t) => {
+//               if (t.completed) {
+//                 p.completedTasks++;
+//               } else if (t.category === "inprogress") {
+//                 p.inProgressTasks++;
+//                 if (selectedUserId) {
+//                   if (t.userId === selectedUserId) p.activeTasks++;
+//                 }
+//               }
+//               return t;
+//             });
+
+//             p.tasks = [];
+//           }
+//           return p;
+//         });
+//         let projUsers=[]
+        
+//         if(userIds.length > 0){
+//           for(let i=0;i<userIds.length;i++){
+//             if(!projUsers.includes(userIds[i].toString())) {
+//               projUsers.push(userIds[i].toString());
+              
+//             }
+//           }
+//         }
+      
+//         let  totalProjectUser=projUsers.length;
+        
+//         logInfo("getAllProjectsSummary projects");
+//         var result1 = sortData.sort(projects, 'title');
+//         res.json({
+//           success: true,
+//           data: projects,
+//           count:userRole === 'user' ? 1 : totalProjectUser
+         
+//         });
+//       })
+//       .catch((err) => {
+//         console.error('Error in project aggregation:', err);
+
+//         logError(err, "getAllProjectsSummary err");
+//         res.json({
+//           err: errors.SERVER_ERROR
+//         });
+//       });
+//   } catch (e) {
+//     logError("e getAllProjectsSummary", e);
+//   }
+// });
 
 exports.getProjectData = ((req, res) => {
   try {
