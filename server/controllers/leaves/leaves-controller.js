@@ -22,10 +22,11 @@ exports.leaveTypes_get_all = ((request, response) => {
     LeaveType.find({
         isActive: "true"
     }).then((result) => {
-
+        console.log('Result of LeaveType.find:', result);
         response.json(result);
 
     }).catch((err) => {
+        console.log('Error in leaveTypes_get_all:', err);
         response.json({
             success: false,
             msg: `Something went wrong ${err}`
@@ -36,6 +37,7 @@ exports.leaveTypes_get_all = ((request, response) => {
 
 exports.getUserOnLeaveDetails = ((request, response) => {
     //console.log("getUserOnLeaveDetails server", request.body);
+    console.log('getUserOnLeaveDetails server', request.body);
     let todaysDate = dateUtil.DateToString(new Date());
     let userId = request.body.userId
     LeaveApplication.find({
@@ -105,6 +107,7 @@ exports.getAllAppliedLeavesforAdmin = ((request, response) => {
             "leaveWithoutApproval": 1
         }).then((result) => {
             // console.log("result", result);
+            console.log('Result of getAllAppliedLeavesforAdmin:', result);
             let finalResult = result.map((r) => {
                 let createdOn=dateUtil.DateToString(r.createdOn);
                 
@@ -125,6 +128,7 @@ exports.getAllAppliedLeavesforAdmin = ((request, response) => {
             response.json(finalResult);
 
         }).catch((err) => {
+            console.log('Error in getAllAppliedLeavesforAdmin:', err);
             response.json({
                 success: false,
                 msg: `Something went wrong ${err}`
@@ -135,6 +139,7 @@ exports.getAllAppliedLeavesforAdmin = ((request, response) => {
 // Save the leave application
 
 exports.leaveApplicationSave = ((request, response) => {
+    console.log('Request body for leaveApplicationSave:', request.body);
     let newLeaveApplication = new LeaveApplication({
         userId: request.body.leaveApplication.createdBy,
         userName: request.body.leaveApplication.userName,
