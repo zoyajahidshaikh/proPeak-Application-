@@ -13,7 +13,7 @@ export default class TaskMenu extends Component {
     state = {
 		taskMenu: [ 
 			{ title: "Task List", url: "/project/tasks/" + this.props.projectId, active: false },
-			// { title: "Add Task", url: "/project/task/create/" + this.props.projectId, active: false },
+			{ title: "Add Task", url: "/project/task/create/" + this.props.projectId, active: false },
 			{ title: "Audit Report", url: "/auditReport/" + this.props.projectId, active: false },
 			{ title: "Project Users", url: "/projectUsers/" + this.props.projectId, active: false },
 			{ title: "Upload Tasks",url:"/uploadTasks/" + this.props.projectId, active: false },

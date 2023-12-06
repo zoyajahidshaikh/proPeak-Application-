@@ -35,17 +35,28 @@ export default class Dashboard extends React.Component {
     });
   }
 
+  // componentDidMount() {
+  //   this.refs.iScroll.addEventListener('scroll', () => {
+  //     if (
+  //       this.refs.iScroll.scrollTop + this.refs.iScroll.clientHeight >=
+  //       this.refs.iScroll.scrollHeight
+  //     ) {
+  //       this.loadMoreItems();
+  //     }
+  //   });
+  // }
   componentDidMount() {
-    this.refs.iScroll.addEventListener('scroll', () => {
-      if (
-        this.refs.iScroll.scrollTop + this.refs.iScroll.clientHeight >=
-        this.refs.iScroll.scrollHeight
-      ) {
-        this.loadMoreItems();
-      }
-    });
+    if (this.iScroll) {
+      this.iScroll.addEventListener('scroll', () => {
+        if (
+          this.iScroll.scrollTop + this.iScroll.clientHeight >=
+          this.iScroll.scrollHeight
+        ) {
+          this.loadMoreItems();
+        }
+      });
+    }
   }
-
   loadMoreItems() {
     this.setState({
       loadingState: true,
