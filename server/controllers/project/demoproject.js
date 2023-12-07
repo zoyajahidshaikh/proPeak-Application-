@@ -533,3 +533,76 @@
 //     logError("e getAllProjectsSummary", e);
 //   }
 // });
+
+
+                       {/* <div className="col-sm-2">
+                                                
+                                                        <input type="submit" id="btnApplyLeave" value="Apply" className="btn btn-info btn-block"
+                                                           
+                                                            disabled={this.state.leaveType === "Comp Off" ?
+                                                                !(workingDays && fromDate && toDate && leaveType && leaveReason && leaveCategory)
+                                                                : this.state.leaveType === 'Sick Leave' || this.state.leaveType === 'Casual Leave' ? !(isElegible && workingDays && fromDate && toDate && leaveType && leaveCategory) : !(workingDays && fromDate && toDate && leaveType && leaveCategory)}
+                                                            onSubmit={this.onApplyLeave} />
+                                                </div> */}
+
+
+
+
+
+
+
+  // async postLeaveApplication(leaveApplication, user) {
+  //     console.log('Data being sent:', leaveApplication);
+  //     let response = { response: "", err: "" }
+  //     console.log("Attempting to post leave application...");
+  //     if (!isNullOrUndefined(leaveApplication.leaveId)) {
+  //         response = await leaveApplicationService.editLeaveApplication(leaveApplication, user);
+
+  //     } else {
+  //         response = await leaveApplicationService.saveLeaveApplication(leaveApplication, user);
+  //     }
+
+  //     this.setState({
+  //         isLoaded: true
+  //     });
+  //     if (response.err) {
+  //         this.setState({
+  //             isLoaded: false,
+  //             fromDate: dateUtil.DateToString(new Date()),
+  //             toDate: dateUtil.DateToString(new Date()),
+  //             workingDays: "1",
+  //             leaveReason: "",
+  //             leaveType: "",
+  //             balanceMessage: '',
+  //             errorMessage: 'Error : ' + response.err
+  //         });
+  //     } else if (response.response && response.response.data.err) {
+  //         this.setState({
+  //             isLoaded: false,
+  //             fromDate: dateUtil.DateToString(new Date()),
+  //             toDate: dateUtil.DateToString(new Date()),
+  //             workingDays: "1",
+  //             leaveReason: "",
+  //             leaveType: "",
+  //             balanceMessage: '',
+  //             errorMessage: 'Error : ' + response.response.data.err
+  //         });
+  //     } else {
+  //         this.setState({
+  //             isLoaded: false,
+  //             fromDate: dateUtil.DateToString(new Date()),
+  //             toDate: dateUtil.DateToString(new Date()),
+  //             workingDays: "1",
+  //             leaveReason: "",
+  //             leaveType: "",
+  //             balanceMessage: '',
+  //             successMessage: response.response.data.message,
+  //             leaveCategory: ''
+  //         });
+  //         // setTimeout(function () {
+  //         //     window.location.href = "/leave"
+  //         // }, 5000);
+  //     }
+  //     console.log('Response:', response);
+
+  // }
