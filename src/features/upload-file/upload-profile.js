@@ -127,13 +127,6 @@ export default class ProfilePicture extends React.Component {
       this.uploadFile(formData);
     }
   }
-
-  // componentWillReceiveProps(nextProps) {
-  //     this.setState({
-  //         uploadFileView: nextProps.uploadFiles
-  //     });
-  // }
-
   onDragOver(ev) {
     ev.preventDefault();
   }
