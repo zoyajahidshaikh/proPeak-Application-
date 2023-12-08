@@ -270,19 +270,26 @@ export default class UserPerformanceReport extends React.Component {
         }
     }
 
-    renderTooltip = (props) => 
-{
-if (props.active) {
-    return (
-            <div style={{border:"1px solid #fff"}}>{props.label}:{props.payload[0].value}</div>     
-        );
-   }
-   return;
-  }
-
-
-
-    render() {
+//     renderTooltip = (props) => 
+// {
+// if (props.active) {
+//     return (
+//             <div style={{border:"1px solid #fff"}}>{props.label}:{props.payload[0].value}</div>     
+//         );
+//    }
+//    return;
+//   }
+renderTooltip = (props) => {
+    if (props.active && props.payload && props.payload.length) {
+      return (
+        <div style={{ border: "1px solid #fff" }}>
+          {props.label}:{props.payload[0].value}
+        </div>
+      );
+    }
+    return null;
+  };
+      render() {
         let users = this.state.users.map((u) => {
             return <option key={u._id} data-value={u._id}>{u.name}</option>
         });
