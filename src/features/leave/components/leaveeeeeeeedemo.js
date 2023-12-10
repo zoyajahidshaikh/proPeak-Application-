@@ -584,3 +584,39 @@
     //     show={config.Export}
     //   />
     // );
+
+
+
+
+
+
+    //leave application 
+      // constructor(props) {
+  //   super(props);
+  //   this.state = {
+  //     leaveReason: "",
+  //     workingDays: "1",
+  //     leaveTypes: this.props.context.state.leaveTypes,
+  //     fromDate: dateUtil.DateToString(new Date()),
+  //     toDate: dateUtil.DateToString(new Date()),
+  //     errorMessage: "",
+  //     successMessage: "",
+  //     users: this.props.context.state.users,
+  //     isLoaded: false,
+  //     leaveId: this.props.leaveId,
+  //     holidayList: [],
+  //     isElegible: false,
+  //     balanceMessage: "",
+  //     isHolidayList: false,
+  //   };
+  //   this.handleChange = this.handleChange.bind(this);
+  //   this.dateCheck = this.dateCheck.bind(this);
+  //   //this.redirect=this.redirect.bind(this);
+  //   this.onApplyLeave = this.onApplyLeave.bind(this);
+  //   this.postLeaveApplication = this.postLeaveApplication.bind(this);
+  //   this.setValues = this.setValues.bind(this);
+  //   this.getAllHolidays = this.getAllHolidays.bind(this);
+  //   this.getHoliday = this.getHoliday.bind(this);
+  //   this.onCheckEligibility = this.onCheckEligibility.bind(this);
+  //   this.closeHolidayList = this.closeHolidayList.bind(this);
+  // }
